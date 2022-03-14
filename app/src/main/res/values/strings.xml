@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">JobFinder</string>
+    <string name="search_hint">Head Hunter vacancy</string>
+    <string name="input_text">android developer</string>
+    <string name="retry">Retry</string>
+    <string name="no_results">No results</string>
+</resources>
