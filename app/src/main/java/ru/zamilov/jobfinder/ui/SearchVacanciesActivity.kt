@@ -11,10 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChangedBy
-import kotlinx.coroutines.flow.filter
 import ru.zamilov.jobfinder.Injection
 import ru.zamilov.jobfinder.databinding.ActivitySearchVacanciesBinding
 
@@ -44,20 +41,13 @@ class SearchVacanciesActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launchWhenCreated {
-            adapter.loadStateFlow
-                .distinctUntilChangedBy { it.refresh }
-                .filter { it.refresh is LoadState.NotLoading }
-                .collect { binding.vacanciesList.scrollToPosition(0) }
-        }
-
-        lifecycleScope.launchWhenCreated {
             adapter.loadStateFlow.collectLatest {
                 binding.swipeRefresh.isRefreshing = it.mediator?.refresh is LoadState.Loading
             }
         }
 
         lifecycleScope.launchWhenCreated {
-            adapter.loadStateFlow.collect { loadState ->
+            adapter.loadStateFlow.collectLatest { loadState ->
                 val isListEmpty =
                     loadState.refresh is LoadState.NotLoading && adapter.itemCount == 0
                 binding.emptyList.isVisible = isListEmpty
@@ -111,6 +101,7 @@ class SearchVacanciesActivity : AppCompatActivity() {
         binding.inputSearch.text.trim().let {
             if (it.isNotBlank()) {
                 viewModel.showVacancy(it.toString())
+                binding.vacanciesList.scrollToPosition(0)
             }
         }
     }
