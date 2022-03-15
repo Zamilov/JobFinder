@@ -11,7 +11,7 @@ import retrofit2.http.Query
 private const val BASE_URL = "https://api.hh.ru/"
 
 interface HeadhunterApiService {
-    @GET("vacancies?&area=2&search_period=30&per_page=20&order_by=publication_time")
+    @GET("vacancies?area=2&search_period=30&per_page=20&order_by=publication_time")
     suspend fun searchVacancies(
         @Query("text") text: String,
         @Query("page") page: Int,

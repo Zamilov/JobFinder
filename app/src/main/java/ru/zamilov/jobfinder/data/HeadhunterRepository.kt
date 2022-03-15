@@ -1,6 +1,5 @@
 package ru.zamilov.jobfinder.data
 
-import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -15,8 +14,6 @@ class HeadhunterRepository(private val service: HeadhunterApiService) {
     }
 
     fun getSearchResultStream(query: String): Flow<PagingData<Vacancy>> {
-        Log.d("HeadhunterRepository", "Query: $query")
-
         return Pager(
             config = PagingConfig(pageSize = NETWORK_PAGE_SIZE),
             pagingSourceFactory = { HeadhunterPagingSource(service, query) }
