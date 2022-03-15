@@ -6,6 +6,7 @@ import android.text.Editable
 import android.text.Html
 import android.text.Spannable
 import android.text.style.BackgroundColorSpan
+import android.text.style.ForegroundColorSpan
 import org.xml.sax.XMLReader
 
 fun formatText(text: String): CharSequence {
@@ -31,6 +32,12 @@ class TagHandler : Html.TagHandler {
                 val end = output.length
                 output.setSpan(
                     BackgroundColorSpan(Color.YELLOW),
+                    start,
+                    end,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                output.setSpan(
+                    ForegroundColorSpan(Color.BLACK),
                     start,
                     end,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
