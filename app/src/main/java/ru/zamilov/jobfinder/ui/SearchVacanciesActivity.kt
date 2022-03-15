@@ -41,12 +41,6 @@ class SearchVacanciesActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launchWhenCreated {
-            adapter.loadStateFlow.collectLatest {
-                binding.swipeRefresh.isRefreshing = it.mediator?.refresh is LoadState.Loading
-            }
-        }
-
-        lifecycleScope.launchWhenCreated {
             adapter.loadStateFlow.collectLatest { loadState ->
                 val isListEmpty =
                     loadState.refresh is LoadState.NotLoading && adapter.itemCount == 0
@@ -54,6 +48,8 @@ class SearchVacanciesActivity : AppCompatActivity() {
                 binding.vacanciesList.isVisible = !isListEmpty
                 binding.progressBar.isVisible = loadState.source.refresh is LoadState.Loading
                 binding.retryButton.isVisible = loadState.source.refresh is LoadState.Error
+
+                binding.swipeRefresh.isRefreshing = loadState.mediator?.refresh is LoadState.Loading
             }
         }
 
