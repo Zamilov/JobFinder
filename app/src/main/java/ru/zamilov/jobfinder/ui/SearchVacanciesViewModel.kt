@@ -20,7 +20,8 @@ class SearchVacanciesViewModel(
     }
 
     init {
-        state.set(KEY_SEARCH, DEFAULT_SEARCH)
+        if (!state.contains(KEY_SEARCH))
+            state.set(KEY_SEARCH, DEFAULT_SEARCH)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
