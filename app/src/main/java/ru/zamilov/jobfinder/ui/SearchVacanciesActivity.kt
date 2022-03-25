@@ -1,9 +1,10 @@
 package ru.zamilov.jobfinder.ui
 
 import android.os.Bundle
-import android.view.KeyEvent
-import android.view.inputmethod.EditorInfo
+import android.view.Menu
+import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
+import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
 import kotlinx.coroutines.flow.collectLatest
 import ru.zamilov.jobfinder.Injection
+import ru.zamilov.jobfinder.R
 import ru.zamilov.jobfinder.databinding.ActivitySearchVacanciesBinding
 
 class SearchVacanciesActivity : AppCompatActivity() {
@@ -29,6 +31,7 @@ class SearchVacanciesActivity : AppCompatActivity() {
 
         binding = ActivitySearchVacanciesBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setSupportActionBar(binding.toolBar)
 
         binding.vacanciesList.adapter = adapter.withLoadStateFooter(
             VacanciesLoadStateAdapter { adapter.retry() }
@@ -57,26 +60,6 @@ class SearchVacanciesActivity : AppCompatActivity() {
 
         binding.retryButton.setOnClickListener { adapter.retry() }
 
-        binding.inputSearch.setOnKeyListener { _, keyCode, event ->
-            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
-                updateVacancyListFromInput()
-                hideKeyboard()
-                true
-            } else {
-                false
-            }
-        }
-
-        binding.inputSearch.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                updateVacancyListFromInput()
-                hideKeyboard()
-                true
-            } else {
-                false
-            }
-        }
-
         binding.vacanciesList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
@@ -87,18 +70,43 @@ class SearchVacanciesActivity : AppCompatActivity() {
         })
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
+
+        val searchItem = menu?.findItem(R.id.app_bar_search)
+        val searchView = searchItem?.actionView as SearchView
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let {
+                    viewModel.showVacancy(it)
+
+                    binding.vacanciesList.scrollToPosition(0)
+                    hideKeyboard()
+                }
+                return true
+            }
+
+            override fun onQueryTextChange(query: String): Boolean {
+                return true
+            }
+        })
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) =
+        when (item.itemId) {
+            R.id.app_bar_filter -> {
+                FilterFragment().show(supportFragmentManager, "filter")
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+
     fun hideKeyboard() {
         val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(this.currentFocus?.windowToken, 0)
         binding.vacanciesList.requestFocus()
-    }
-
-    private fun updateVacancyListFromInput() {
-        binding.inputSearch.text.trim().let {
-            if (it.isNotBlank()) {
-                viewModel.showVacancy(it.toString())
-                binding.vacanciesList.scrollToPosition(0)
-            }
-        }
     }
 }

@@ -4,4 +4,8 @@
     <string name="input_text">android developer</string>
     <string name="retry">Retry</string>
     <string name="no_results">No results</string>
+    <string name="start">OK</string>
+    <string name="dialog">Filter</string>
+    <string name="menu_search">Search</string>
+    <string name="menu_filter">Filter</string>
 </resources>
